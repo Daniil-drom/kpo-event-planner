@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Планировщик мероприятий</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header"><a href="/" class="brand">Городские события</a></header>
+  <main>
+    <p class="eyebrow">Ваше свободное время</p>
+    <h1>Планы начинаются с интересного события</h1>
+    <p class="intro">Выбирайте мероприятия своего города и собирайте личное расписание.</p>
+    <section class="catalog" aria-labelledby="catalog-title">
+      <div class="catalog-heading">
+        <h2 id="catalog-title">Мероприятия</h2>
+        <div class="city-field">
+          <label for="city">Город</label>
+          <select id="city" disabled><option>Загрузка городов…</option></select>
+        </div>
+      </div>
+      <p id="notice" role="status" aria-live="polite"></p>
+      <div class="empty-state">
+        <h3>Каталог пока пуст</h3>
+        <p>Здесь появятся мероприятия после загрузки данных.</p>
+      </div>
+    </section>
+  </main>
+  <footer>Источник сведений о мероприятиях — <a href="https://kudago.com/">KudaGo</a></footer>
+</body>
+</html>

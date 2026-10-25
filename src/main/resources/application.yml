@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: event-planner
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/event_planner}
+    username: ${DB_USER:planner}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 5000
+  flyway:
+    enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

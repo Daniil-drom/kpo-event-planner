@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; color: #18302b; background: #f7f8f4; line-height: 1.55; }
+.site-header, main, footer { width: min(100% - 40px, 1040px); margin-inline: auto; }
+.site-header { padding-block: 24px; border-bottom: 1px solid #dce2d8; }
+.brand { font-size: 20px; font-weight: bold; text-decoration: none; color: inherit; }
+main { padding-block: 52px; }
+.eyebrow { color: #476b50; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; }
+h1 { max-width: 730px; font-size: clamp(30px, 5vw, 46px); line-height: 1.15; margin: 12px 0 20px; }
+.intro { max-width: 600px; color: #53665e; }
+.catalog { margin-top: 40px; background: white; border: 1px solid #dce2d8; border-radius: 14px; padding: 24px; }
+.catalog-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+h2 { margin: 0; font-size: 24px; }
+.city-field { display: flex; flex-direction: column; gap: 6px; }
+label { font-size: 14px; }
+select { min-width: 230px; padding: 10px; color: inherit; background: white; border: 1px solid #92a598; border-radius: 6px; font: inherit; }
+select:focus-visible, a:focus-visible { outline: 3px solid #3c795b; outline-offset: 3px; }
+#notice { color: #53665e; min-height: 1.6em; font-size: 14px; }
+.empty-state { margin-top: 16px; padding: 40px 16px; text-align: center; background: #f5f7f1; border-radius: 8px; }
+.empty-state h3 { font-size: 20px; }
+.empty-state p, footer { color: #53665e; }
+footer { padding-block: 20px 32px; font-size: 14px; }
+a { color: #276149; }
+@media (max-width: 520px) {
+  main { padding-block: 28px; }
+  .catalog { padding: 16px; }
+  .city-field, select { width: 100%; min-width: 0; }
+}
