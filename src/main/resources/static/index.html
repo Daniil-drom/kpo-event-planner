@@ -22,11 +22,19 @@
         </div>
       </div>
       <p id="notice" role="status" aria-live="polite"></p>
-      <div class="empty-state">
-        <h3>Каталог пока пуст</h3>
-        <p>Здесь появятся мероприятия после загрузки данных.</p>
-      </div>
+      <form id="filters">
+        <label>Категория<select id="category"><option value="">Все категории</option></select></label>
+        <label>С даты<input id="dateFrom" type="date"></label>
+        <label>По дату<input id="dateTo" type="date"></label>
+        <label class="check"><input id="free" type="checkbox"> Только бесплатно</label>
+        <button type="submit">Показать</button>
+      </form>
+      <div id="events" class="event-grid"></div>
+      <nav class="pagination" aria-label="Страницы каталога">
+        <button id="prev" disabled>Назад</button><span id="page"></span><button id="next" disabled>Далее</button>
+      </nav>
     </section>
+    <dialog id="detail"><button id="close-detail" autofocus>Закрыть</button><div id="detail-content"></div></dialog>
   </main>
   <footer>Источник сведений о мероприятиях — <a href="https://kudago.com/">KudaGo</a></footer>
 </body>
