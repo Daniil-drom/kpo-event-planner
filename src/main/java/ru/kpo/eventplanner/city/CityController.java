@@ -18,10 +18,10 @@ public class CityController {
     @GetMapping
     public List<CityResponse> findAll() {
         return jdbc.query("""
-                SELECT id, kudago_slug, name, timezone
-                FROM cities ORDER BY name
+                SELECT id, slug, name, timezone
+                FROM cities WHERE enabled ORDER BY name
                 """, (row, number) -> new CityResponse(
-                row.getLong("id"), row.getString("kudago_slug"),
+                row.getLong("id"), row.getString("slug"),
                 row.getString("name"), row.getString("timezone")));
     }
 

@@ -26,3 +26,9 @@ management:
   endpoint:
     health:
       show-details: never
+linked-events:
+  base-url: ${LINKED_EVENTS_BASE_URL:https://api.hel.fi/linkedevents/v1}
+  sync-enabled: ${LINKED_EVENTS_SYNC_ENABLED:true}
+  sync-delay-ms: ${LINKED_EVENTS_SYNC_DELAY_MS:3600000}
+  horizon-days: ${LINKED_EVENTS_HORIZON_DAYS:90}
+  max-pages: ${LINKED_EVENTS_MAX_PAGES:200}

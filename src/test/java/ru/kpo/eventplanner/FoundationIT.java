@@ -23,7 +23,7 @@ class FoundationIT {
     void exposesSeededCitiesThroughHttp() {
         var response = http.getForEntity("/api/cities", String.class);
         assertThat(response.getStatusCode().value()).isEqualTo(200);
-        assertThat(response.getBody()).contains("spb", "msk", "ekb", "Europe/Moscow", "Asia/Yekaterinburg");
+        assertThat(response.getBody()).contains("helsinki", "Europe/Helsinki").doesNotContain("spb", "msk", "ekb");
     }
 
     @Test
@@ -78,8 +78,8 @@ class FoundationIT {
 
     private long createEvent() {
         return jdbc.queryForObject("""
-                INSERT INTO events(kudago_id, city_id, title, site_url)
-                VALUES (900000001, (SELECT id FROM cities WHERE kudago_slug = 'spb'),
+                INSERT INTO events(external_id, city_id, title, site_url)
+                VALUES ('900000001', (SELECT id FROM cities WHERE slug = 'spb'),
                         'Test event', 'https://example.test/event')
                 RETURNING id
                 """, Long.class);

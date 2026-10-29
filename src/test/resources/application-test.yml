@@ -1,4 +1,4 @@
-kudago:
+linked-events:
   sync-enabled: false
 spring:
   datasource:

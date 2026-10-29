@@ -12,17 +12,18 @@ function element(tag, text) {
   node.textContent = text;
   return node;
 }
-function time(value, zone) {
+function time(value, zone, hasTime = true) {
+  if (value && !hasTime) return new Date(value).toLocaleDateString('ru-RU', {timeZone: zone, dateStyle: 'short'});
   return value ? new Date(value).toLocaleString('ru-RU', {timeZone: zone, dateStyle: 'short', timeStyle: 'short'}) : 'Время уточняется';
 }
 function source(url) {
-  const link = element('a', 'Подробнее на KudaGo');
+  const link = element('a', 'Подробнее у организатора');
   try {
     const parsed = new URL(url);
-    if (['http:', 'https:'].includes(parsed.protocol) && (parsed.hostname === 'kudago.com' || parsed.hostname.endsWith('.kudago.com'))) link.href = parsed.href;
+    if (['http:', 'https:'].includes(parsed.protocol) && !parsed.username && !parsed.password) link.href = parsed.href;
   } catch { /* Некорректная внешняя ссылка остаётся текстом. */ }
   link.target = '_blank';
-  link.rel = 'noopener';
+  link.rel = 'noopener noreferrer';
   return link;
 }
 async function showDetail(id) {
@@ -38,7 +39,8 @@ async function showDetail(id) {
       element('p', event.isFree ? 'Бесплатно' : event.price || 'Стоимость уточняется'),
       element('p', event.ageRestriction || ''), element('p', 'Время указано для города ' + event.city + '.')];
     for (const session of event.sessions) nodes.push(element('p',
-      time(session.startAt, event.timezone) + ' — ' + (session.isEndless ? 'без даты окончания' : time(session.endAt, event.timezone))));
+      time(session.startAt, event.timezone, session.hasStartTime) + ' — ' + (session.isEndless ? 'без даты окончания' : time(session.endAt, event.timezone, session.hasEndTime))));
+    if (!event.isActive) nodes.push(element('p', 'Событие больше не доступно в актуальном каталоге.'));
     nodes.push(source(event.siteUrl));
     $('detail-content').replaceChildren(...nodes);
   } catch (error) {
@@ -62,7 +64,7 @@ async function loadEvents() {
       card.className = 'event-card';
       const button = element('button', 'Открыть событие');
       button.addEventListener('click', () => showDetail(event.id));
-      card.append(element('h3', event.title), element('p', time(event.nextSession, event.timezone)),
+      card.append(element('h3', event.title), element('p', time(event.nextSession, event.timezone, event.nextSessionHasTime)),
         element('p', event.place || 'Место уточняется'), element('p', event.isFree ? 'Бесплатно' : event.price || 'Стоимость уточняется'),
         button, source(event.siteUrl));
       $('events').append(card);
@@ -94,7 +96,7 @@ async function start() {
     const cities = await json('/api/cities');
     $('city').replaceChildren(...cities.map((city) => new Option(city.name, city.slug)));
     $('city').disabled = cities.length === 0;
-    if (cities.some((city) => city.slug === 'spb')) $('city').value = 'spb';
+    if (cities.some((city) => city.slug === 'helsinki')) $('city').value = 'helsinki';
     if (cities.length) await loadEvents();
     else $('notice').textContent = 'Города пока не добавлены.';
   } catch (error) { $('notice').textContent = error.message; }
