@@ -1,0 +1,7 @@
+linked-events:
+  sync-enabled: false
+spring:
+  datasource:
+    url: ${TEST_DATABASE_URL:jdbc:postgresql://localhost:15432/event_planner_test}
+    username: ${TEST_DATABASE_USER:planner_test}
+    password: ${TEST_DATABASE_PASSWORD:planner_test}
