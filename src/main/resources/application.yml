@@ -32,3 +32,7 @@ linked-events:
   sync-delay-ms: ${LINKED_EVENTS_SYNC_DELAY_MS:3600000}
   horizon-days: ${LINKED_EVENTS_HORIZON_DAYS:90}
   max-pages: ${LINKED_EVENTS_MAX_PAGES:200}
+  max-attempts: ${LINKED_EVENTS_MAX_ATTEMPTS:3}
+  retry-delay-ms: ${LINKED_EVENTS_RETRY_DELAY_MS:1000}
+  max-retry-delay-ms: ${LINKED_EVENTS_MAX_RETRY_DELAY_MS:60000}
+  page-delay-ms: ${LINKED_EVENTS_PAGE_DELAY_MS:250}

@@ -13,7 +13,8 @@ class LinkedEventsClientTest {
     LinkedEventsClient client;
     @BeforeEach void start() throws Exception {
         server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
-        client=new LinkedEventsClient("http://127.0.0.1:"+server.getAddress().getPort(),90,2);
+        client=new LinkedEventsClient("http://127.0.0.1:"+server.getAddress().getPort(),90,2,
+                new LinkedEventsRetry(1,1000,60000,0));
         server.start();
     }
     @AfterEach void stop() { server.stop(0); }

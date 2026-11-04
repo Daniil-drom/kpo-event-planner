@@ -18,14 +18,17 @@ public class LinkedEventsClient {
     private final RestClient http;
     private final int horizonDays;
     private final int maxPages;
+    private final LinkedEventsRetry retry;
 
     public LinkedEventsClient(
             @Value("${linked-events.base-url:https://api.hel.fi/linkedevents/v1}") String url,
             @Value("${linked-events.horizon-days:90}") int horizonDays,
-            @Value("${linked-events.max-pages:200}") int maxPages) {
+            @Value("${linked-events.max-pages:200}") int maxPages,
+            LinkedEventsRetry retry) {
         if (horizonDays < 1 || maxPages < 1) throw new IllegalArgumentException("Invalid import limits");
         this.horizonDays = horizonDays;
         this.maxPages = maxPages;
+        this.retry = retry;
         var factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(10000);
         factory.setReadTimeout(60000);
@@ -41,13 +44,13 @@ public class LinkedEventsClient {
         var end = start.plus(horizonDays, ChronoUnit.DAYS);
         for (int page = 1; page <= maxPages; page++) {
             final int number = page;
-            var data = http.get().uri(b -> b.path("/event/")
+            var data = retry.execute(() -> http.get().uri(b -> b.path("/event/")
                     .queryParam("format", "json").queryParam("division", division)
                     .queryParam("page", number).queryParam("page_size", 100)
                     .queryParam("start", start.toString()).queryParam("end", end.toString())
                     .queryParam("sort", "last_modified_time,start_time,name").queryParam("super_event_type", "none")
                     .queryParam("include", "location,keywords")
-                    .build()).retrieve().body(JsonNode.class);
+                    .build()).retrieve().body(JsonNode.class));
             if (data == null || !data.path("data").isArray() || !data.path("meta").has("next"))
                 throw new IllegalStateException("Invalid Linked Events page " + page);
             var next = data.path("meta").get("next");
@@ -65,6 +68,7 @@ public class LinkedEventsClient {
             if (next.isNull()) return new ArrayList<>(events.values());
             if (data.path("data").isEmpty()) throw new IllegalStateException("Empty intermediate page");
             if (events.size() == previousSize) throw new IllegalStateException("Pagination made no progress");
+            if (page < maxPages) retry.betweenPages();
             // Never follow an upstream URL: construct the next request against our configured host.
         }
         throw new IllegalStateException("Pagination limit exceeded; previous catalogue preserved");

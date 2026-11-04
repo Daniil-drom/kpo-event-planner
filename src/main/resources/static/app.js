@@ -2,6 +2,9 @@ const $ = (id) => document.getElementById(id);
 let page = 0;
 let request = 0;
 let detailRequest = 0;
+let statusRequest = 0;
+let statusTimer;
+let lastSuccessRunId;
 async function json(url) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(response.status === 400 ? 'Проверьте даты и фильтры.' : 'Не удалось загрузить данные. Попробуйте ещё раз.');
@@ -69,7 +72,7 @@ async function loadEvents() {
         button, source(event.siteUrl));
       $('events').append(card);
     }
-    $('notice').textContent = data.totalItems ? 'Найдено: ' + data.totalItems : 'Мероприятий нет. Измените фильтры или повторите поиск позже: каталог мог ещё не обновиться.';
+    $('notice').textContent = data.totalItems ? 'Найдено: ' + data.totalItems : 'По выбранным фильтрам мероприятий пока нет.';
     $('page').textContent = data.totalPages ? (page + 1) + ' / ' + data.totalPages : '';
     $('prev').disabled = page === 0;
     $('next').disabled = page + 1 >= data.totalPages;
@@ -77,7 +80,7 @@ async function loadEvents() {
   } catch (error) { if (current === request) $('notice').textContent = error.message; }
 }
 $('filters').addEventListener('submit', (event) => { event.preventDefault(); page = 0; loadEvents(); });
-$('city').addEventListener('change', () => { page = 0; loadEvents(); });
+$('city').addEventListener('change', () => { page = 0; loadEvents(); watchStatus(); });
 $('prev').addEventListener('click', () => { page--; loadEvents(); });
 $('next').addEventListener('click', () => { page++; loadEvents(); });
 $('close-detail').addEventListener('click', () => $('detail').close());
@@ -91,13 +94,59 @@ async function refreshCategories() {
     $('category').disabled = false;
   } catch { /* Каталог остаётся доступным при ошибке загрузки категорий. */ }
 }
+function syncMessage(data) {
+  const messages = [];
+  if (!data.syncEnabled) messages.push('Автоматическое обновление отключено.');
+  if (data.status === 'RUNNING') messages.push(data.lastSuccessAt
+    ? 'Каталог обновляется. Можно пользоваться сохранёнными данными.'
+    : 'Идёт первая загрузка каталога. Мероприятия появятся после её завершения.');
+  else if (data.status === 'FAILED') messages.push(data.lastSuccessAt
+    ? 'Не удалось обновить каталог. Доступны ранее сохранённые данные.'
+    : 'Первая загрузка каталога не завершилась.');
+  else if (data.status === 'NOT_STARTED') messages.push('Каталог ещё не загружен.');
+  if (data.status === 'FAILED' && data.syncEnabled) messages.push('Сервер повторит загрузку автоматически.');
+  if (data.lastSuccessAt) messages.push('Последнее успешное обновление: '
+    + new Date(data.lastSuccessAt).toLocaleString('ru-RU') + ' (время вашего устройства).');
+  if (data.stale) messages.push('Данные могут быть устаревшими.');
+  return messages.join(' ');
+}
+function watchStatus() {
+  clearTimeout(statusTimer);
+  const current = ++statusRequest;
+  const city = $('city').value;
+  lastSuccessRunId = undefined;
+  $('sync-status').textContent = 'Проверка обновления каталога…';
+  $('sync-status').dataset.warning = 'false';
+  async function poll() {
+    let delay = 30000;
+    try {
+      const data = await json('/api/catalog/status?' + new URLSearchParams({city}));
+      if (current !== statusRequest) return;
+      $('sync-status').textContent = syncMessage(data);
+      $('sync-status').dataset.warning = String(data.status === 'FAILED' || data.stale);
+      if (data.status === 'RUNNING' || data.status === 'NOT_STARTED') delay = 5000;
+      // Refresh even if the first status response arrives just after the initial import.
+      if (data.lastSuccessRunId != null && data.lastSuccessRunId !== lastSuccessRunId) {
+        lastSuccessRunId = data.lastSuccessRunId;
+        page = 0;
+        await loadEvents();
+      }
+    } catch {
+      if (current !== statusRequest) return;
+      $('sync-status').textContent = 'Не удалось проверить обновление каталога. Список мероприятий остаётся доступным.';
+      $('sync-status').dataset.warning = 'true';
+    }
+    if (current === statusRequest) statusTimer = setTimeout(poll, delay);
+  }
+  poll();
+}
 async function start() {
   try {
     const cities = await json('/api/cities');
     $('city').replaceChildren(...cities.map((city) => new Option(city.name, city.slug)));
     $('city').disabled = cities.length === 0;
     if (cities.some((city) => city.slug === 'helsinki')) $('city').value = 'helsinki';
-    if (cities.length) await loadEvents();
+    if (cities.length) { watchStatus(); await loadEvents(); }
     else $('notice').textContent = 'Города пока не добавлены.';
   } catch (error) { $('notice').textContent = error.message; }
 }

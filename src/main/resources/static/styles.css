@@ -29,6 +29,8 @@ label { font-size: 14px; }
 select { min-width: 230px; padding: 10px; color: inherit; background: white; border: 1px solid #92a598; border-radius: 6px; font: inherit; }
 select:focus-visible, a:focus-visible { outline: 3px solid #3c795b; outline-offset: 3px; }
 #notice { color: #53665e; min-height: 1.6em; font-size: 14px; }
+#sync-status { color: #53665e; font-size: 14px; }
+#sync-status[data-warning="true"] { color: #805116; }
 .empty-state { margin-top: 16px; padding: 40px 16px; text-align: center; background: #f5f7f1; border-radius: 8px; }
 .empty-state h3 { font-size: 20px; }
 .empty-state p, footer { color: #53665e; }
