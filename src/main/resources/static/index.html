@@ -6,9 +6,19 @@
   <title>Планировщик мероприятий</title>
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
+  <script src="/auth.js" defer></script>
 </head>
 <body>
-  <header class="site-header"><a href="/" class="brand">Городские события</a></header>
+  <header class="site-header">
+    <a href="/" class="brand">Городские события</a>
+    <div class="account-controls" aria-label="Аккаунт">
+      <span id="account-status" role="status">Проверка входа…</span>
+      <button id="open-login" type="button">Войти</button>
+      <button id="open-register" type="button" class="secondary-button">Регистрация</button>
+      <button id="logout" type="button" hidden>Выйти</button>
+    </div>
+    <p id="account-notice" role="status" aria-live="polite"></p>
+  </header>
   <main>
     <p class="eyebrow">Ваше свободное время</p>
     <h1>Планы начинаются с интересного события</h1>
@@ -36,6 +46,23 @@
       </nav>
     </section>
     <dialog id="detail"><button id="close-detail" autofocus>Закрыть</button><div id="detail-content"></div></dialog>
+    <dialog id="auth-dialog" aria-labelledby="auth-title">
+      <div class="auth-heading"><h2 id="auth-title">Вход</h2><button id="close-auth" type="button" class="secondary-button">Закрыть</button></div>
+      <form id="auth-form">
+        <label for="auth-email">Email</label>
+        <input id="auth-email" name="email" type="email" maxlength="320" autocomplete="username" required>
+        <label for="auth-password">Пароль</label>
+        <input id="auth-password" name="password" type="password" maxlength="72" autocomplete="current-password" required aria-describedby="password-hint">
+        <p id="password-hint">Пароль, указанный при регистрации.</p>
+        <div id="confirm-field" hidden>
+          <label for="auth-confirm">Повторите пароль</label>
+          <input id="auth-confirm" type="password" maxlength="72" autocomplete="new-password">
+        </div>
+        <p id="auth-notice" role="alert" aria-live="polite"></p>
+        <button id="auth-submit" type="submit">Войти</button>
+        <button id="switch-auth" type="button" class="secondary-button">Создать аккаунт</button>
+      </form>
+    </dialog>
   </main>
   <footer>Источник сведений о мероприятиях — <a href="https://api.hel.fi/linkedevents/v1/">Helsinki Linked Events</a></footer>
 </body>

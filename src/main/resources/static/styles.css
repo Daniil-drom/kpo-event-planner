@@ -1,4 +1,5 @@
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 button, input { font: inherit; padding: 10px; border: 1px solid #92a598; border-radius: 6px; }
 button { cursor: pointer; color: white; background: #276149; }
 button:disabled { opacity: .45; cursor: default; }
@@ -16,6 +17,18 @@ dialog::backdrop { background: #18302b88; }
 body { margin: 0; font-family: Arial, sans-serif; color: #18302b; background: #f7f8f4; line-height: 1.55; }
 .site-header, main, footer { width: min(100% - 40px, 1040px); margin-inline: auto; }
 .site-header { padding-block: 24px; border-bottom: 1px solid #dce2d8; }
+.site-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.account-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }
+#account-status { font-size: 14px; overflow-wrap: anywhere; }
+#account-notice { width: 100%; margin: 0; font-size: 14px; color: #53665e; }
+.secondary-button { color: #276149; background: white; }
+#auth-dialog { width: min(460px,90vw); }
+.auth-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+#auth-form { display: grid; gap: 10px; }
+#auth-form input { width: 100%; min-width: 0; }
+#confirm-field { display: grid; gap: 10px; }
+#password-hint { margin: 0; color: #53665e; font-size: 13px; }
+#auth-notice { min-height: 1.5em; margin: 4px 0; overflow-wrap: anywhere; }
 .brand { font-size: 20px; font-weight: bold; text-decoration: none; color: inherit; }
 main { padding-block: 52px; }
 .eyebrow { color: #476b50; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; }
