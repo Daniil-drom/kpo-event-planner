@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: event-planner
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/event_planner}
+    username: ${DB_USER:planner}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 5000
+  flyway:
+    enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: ${SESSION_TIMEOUT:30m}
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${SESSION_COOKIE_SECURE:false}
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+linked-events:
+  base-url: ${LINKED_EVENTS_BASE_URL:https://api.hel.fi/linkedevents/v1}
+  sync-enabled: ${LINKED_EVENTS_SYNC_ENABLED:true}
+  sync-delay-ms: ${LINKED_EVENTS_SYNC_DELAY_MS:3600000}
+  horizon-days: ${LINKED_EVENTS_HORIZON_DAYS:90}
+  max-pages: ${LINKED_EVENTS_MAX_PAGES:200}
+  max-attempts: ${LINKED_EVENTS_MAX_ATTEMPTS:3}
+  retry-delay-ms: ${LINKED_EVENTS_RETRY_DELAY_MS:1000}
+  max-retry-delay-ms: ${LINKED_EVENTS_MAX_RETRY_DELAY_MS:60000}
+  page-delay-ms: ${LINKED_EVENTS_PAGE_DELAY_MS:250}

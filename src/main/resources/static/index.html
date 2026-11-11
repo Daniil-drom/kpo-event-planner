@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Планировщик мероприятий</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <script src="/auth.js" defer></script>
+  <script src="/visits.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="brand">Городские события</a>
+    <a href="#schedule">Моё расписание</a>
+    <div class="account-controls" aria-label="Аккаунт">
+      <span id="account-status" role="status">Проверка входа…</span>
+      <button id="open-login" type="button">Войти</button>
+      <button id="open-register" type="button" class="secondary-button">Регистрация</button>
+      <button id="logout" type="button" hidden>Выйти</button>
+    </div>
+    <p id="account-notice" role="status" aria-live="polite"></p>
+  </header>
+  <main>
+    <p class="eyebrow">Ваше свободное время</p>
+    <h1>Планы начинаются с интересного события</h1>
+    <p class="intro">Мероприятия Хельсинки на ближайшие 90 дней. Описания доступны на языке источника.</p>
+    <section class="catalog" aria-labelledby="catalog-title">
+      <div class="catalog-heading">
+        <h2 id="catalog-title">Мероприятия</h2>
+        <div class="city-field">
+          <label for="city">Город</label>
+          <select id="city" disabled><option>Загрузка городов…</option></select>
+        </div>
+      </div>
+      <p id="sync-status" role="status" aria-live="polite"></p>
+      <p id="notice" role="status" aria-live="polite"></p>
+      <form id="filters">
+        <label>Категория<select id="category"><option value="">Все категории</option></select></label>
+        <label>С даты<input id="dateFrom" type="date"></label>
+        <label>По дату<input id="dateTo" type="date"></label>
+        <label class="check"><input id="free" type="checkbox"> Только бесплатно</label>
+        <button type="submit">Показать</button>
+      </form>
+      <div id="events" class="event-grid"></div>
+      <nav class="pagination" aria-label="Страницы каталога">
+        <button id="prev" disabled>Назад</button><span id="page"></span><button id="next" disabled>Далее</button>
+      </nav>
+    </section>
+    <section id="schedule" class="catalog" aria-labelledby="schedule-title">
+      <div class="catalog-heading">
+        <h2 id="schedule-title">Моё расписание</h2>
+        <div class="schedule-tools" id="schedule-tools" hidden>
+          <label for="visit-filter">Статус</label>
+          <select id="visit-filter">
+            <option value="">Все статусы</option>
+            <option value="WANT_TO_VISIT">Хочу посетить</option>
+            <option value="PLANNED">Запланировано</option>
+            <option value="VISITED">Посещено</option>
+          </select>
+        </div>
+      </div>
+      <p id="schedule-timezone"></p>
+      <p id="schedule-notice" role="status" aria-live="polite">Войдите, чтобы составить личное расписание.</p>
+      <button id="schedule-login" type="button">Войти</button>
+      <button id="refresh-visits" type="button" class="secondary-button" hidden>Обновить расписание</button>
+      <div id="visits"></div>
+    </section>
+    <dialog id="detail"><button id="close-detail" autofocus>Закрыть</button><div id="detail-content"></div></dialog>
+    <dialog id="visit-dialog" aria-labelledby="visit-title">
+      <div class="auth-heading"><h2 id="visit-title">Добавить в расписание</h2><button id="close-visit" type="button" class="secondary-button">Закрыть</button></div>
+      <p id="visit-event-title"></p>
+      <p id="visit-availability" class="warning"></p>
+      <form id="visit-form">
+        <label for="visit-status">Статус</label>
+        <select id="visit-status" required>
+          <option value="WANT_TO_VISIT">Хочу посетить</option>
+          <option value="PLANNED">Запланировано</option>
+          <option value="VISITED">Посещено</option>
+        </select>
+        <p id="visit-timezone"></p>
+        <label for="visit-start">Начало посещения</label>
+        <input id="visit-start" type="datetime-local" step="1">
+        <label for="visit-end">Окончание посещения</label>
+        <input id="visit-end" type="datetime-local" step="1">
+        <p class="form-hint">Для статуса «Запланировано» укажите оба времени. В остальных статусах их можно оставить пустыми.</p>
+        <div id="visit-conflicts" class="conflict-box" hidden>
+          <p>Посещение пересекается с другими запланированными мероприятиями:</p>
+          <ul id="visit-conflict-list"></ul>
+          <label class="check"><input id="accept-conflict" type="checkbox"> Сохранить с пересечением</label>
+        </div>
+        <p id="visit-notice" role="alert" aria-live="polite"></p>
+        <button id="save-visit" type="submit">Сохранить</button>
+      </form>
+    </dialog>
+    <dialog id="auth-dialog" aria-labelledby="auth-title">
+      <div class="auth-heading"><h2 id="auth-title">Вход</h2><button id="close-auth" type="button" class="secondary-button">Закрыть</button></div>
+      <form id="auth-form">
+        <label for="auth-email">Email</label>
+        <input id="auth-email" name="email" type="email" maxlength="320" autocomplete="username" required>
+        <label for="auth-password">Пароль</label>
+        <input id="auth-password" name="password" type="password" maxlength="72" autocomplete="current-password" required aria-describedby="password-hint">
+        <p id="password-hint">Пароль, указанный при регистрации.</p>
+        <div id="confirm-field" hidden>
+          <label for="auth-confirm">Повторите пароль</label>
+          <input id="auth-confirm" type="password" maxlength="72" autocomplete="new-password">
+        </div>
+        <p id="auth-notice" role="alert" aria-live="polite"></p>
+        <button id="auth-submit" type="submit">Войти</button>
+        <button id="switch-auth" type="button" class="secondary-button">Создать аккаунт</button>
+      </form>
+    </dialog>
+  </main>
+  <footer>Источник сведений о мероприятиях — <a href="https://api.hel.fi/linkedevents/v1/">Helsinki Linked Events</a></footer>
+</body>
+</html>
