@@ -10,6 +10,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid #3c795b; outline-
 .event-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,260px),1fr)); gap: 16px; }
 .event-card { padding: 20px; border: 1px solid #dce2d8; border-radius: 8px; overflow-wrap: anywhere; }
 .event-card a { display: block; margin-top: 12px; }
+.event-card > button { margin: 4px 6px 4px 0; }
 .pagination { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 24px; }
 dialog { width: min(680px,90vw); max-height: 85vh; overflow: auto; border: 1px solid #92a598; border-radius: 12px; padding: 24px; color: #18302b; }
 dialog::backdrop { background: #18302b88; }
@@ -25,6 +26,22 @@ body { margin: 0; font-family: Arial, sans-serif; color: #18302b; background: #f
 #auth-dialog { width: min(460px,90vw); }
 .auth-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 #auth-form { display: grid; gap: 10px; }
+#visit-form { display: grid; gap: 10px; }
+#visit-form input, #visit-form select { width: 100%; min-width: 0; }
+#visit-form .check { display: flex; align-items: start; gap: 8px; }
+#visit-form .check input { width: auto; margin-top: 6px; }
+.form-hint, #visit-timezone, #schedule-timezone { color: #53665e; font-size: 13px; }
+.warning { color: #805116; }
+.conflict-box { border: 1px solid #d8b577; background: #fff8e9; padding: 14px; border-radius: 8px; }
+.conflict-box p { margin-top: 0; }
+.conflict-box ul { padding-left: 22px; }
+#visit-notice { min-height: 1.5em; overflow-wrap: anywhere; }
+.schedule-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.visit-status { font-weight: bold; color: #276149; }
+.visit-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.event-card h4 { margin: 0; font-size: 18px; }
+#visits > h3 { margin-top: 28px; }
+#schedule { scroll-margin-top: 20px; }
 #auth-form input { width: 100%; min-width: 0; }
 #confirm-field { display: grid; gap: 10px; }
 #password-hint { margin: 0; color: #53665e; font-size: 13px; }

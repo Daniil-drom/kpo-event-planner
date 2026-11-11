@@ -34,7 +34,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(access -> access
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/", "/index.html", "/app.js", "/auth.js", "/styles.css",
+                        .requestMatchers(HttpMethod.GET, "/", "/index.html", "/app.js", "/auth.js", "/visits.js", "/styles.css",
                                 "/favicon.ico", "/actuator/health", "/api/cities", "/api/categories",
                                 "/api/events", "/api/events/*", "/api/catalog/status", "/api/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/logout").permitAll()

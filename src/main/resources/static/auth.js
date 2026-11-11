@@ -5,9 +5,11 @@
   let mode = 'login';
   let busy = false;
   let accountRequest = 0;
+  let account = null;
+  let accountKnown = false;
 
   class ApiError extends Error {
-    constructor(status, message) { super(message); this.status = status; }
+    constructor(status, message, data) { super(message); this.status = status; this.data = data; }
   }
 
   async function request(url, options = {}) {
@@ -15,25 +17,31 @@
     try { response = await fetch(url, {credentials: 'same-origin', cache: 'no-store', ...options}); }
     catch { throw new Error('Сервер недоступен. Повторите попытку позже.'); }
     const data = response.status === 204 ? null : await response.json().catch(() => ({}));
-    if (!response.ok) throw new ApiError(response.status, data?.message || 'Не удалось выполнить действие. Повторите позже.');
+    if (!response.ok) throw new ApiError(response.status, data?.message || data?.detail || 'Не удалось выполнить действие. Повторите позже.', data);
     return data;
   }
 
-  async function post(url, data, asForm = false) {
+  async function mutate(url, method, data, asForm = false) {
     // Obtain a fresh token before every action: login and logout rotate or clear it.
     const csrf = await request('/api/auth/csrf');
     const headers = {[csrf.headerName]: csrf.token};
     if (!asForm && data != null) headers['Content-Type'] = 'application/json';
     return request(url, {
-      method: 'POST', headers,
+      method, headers,
       body: data == null ? undefined : asForm ? new URLSearchParams(data) : JSON.stringify(data)
     });
   }
 
+  const post = (url, data, asForm = false) => mutate(url, 'POST', data, asForm);
+
   function renderAccount(user) {
+    const changed = !accountKnown || account?.id !== user?.id;
+    account = user;
+    accountKnown = true;
     byId('account-status').textContent = user ? user.email : 'Гость';
     byId('open-login').hidden = byId('open-register').hidden = Boolean(user);
     byId('logout').hidden = !user;
+    if (changed) document.dispatchEvent(new CustomEvent('planner:account-changed', {detail: user}));
   }
 
   async function refreshAccount() {
@@ -43,8 +51,8 @@
       if (current === accountRequest) renderAccount(user);
     } catch (error) {
       if (current !== accountRequest) return;
-      renderAccount(null);
-      if (error.status !== 401) {
+      if (error.status === 401) renderAccount(null);
+      else {
         byId('account-status').textContent = 'Вход не проверен';
         byId('account-notice').textContent = error.message;
       }
@@ -141,6 +149,9 @@
 
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && !busy) refreshAccount();
+  });
+  window.plannerAuth = Object.freeze({
+    get user() { return account; }, request, mutate, refresh: refreshAccount, openLogin: () => open('login')
   });
   refreshAccount();
 })();

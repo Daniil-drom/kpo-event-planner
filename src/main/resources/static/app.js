@@ -29,6 +29,13 @@ function source(url) {
   link.rel = 'noopener noreferrer';
   return link;
 }
+function saveVisitButton(id) {
+  const button = element('button', 'Добавить в расписание');
+  button.type = 'button';
+  button.dataset.saveEvent = id;
+  button.className = 'secondary-button';
+  return button;
+}
 async function showDetail(id) {
   const current = ++detailRequest;
   const dialog = $('detail');
@@ -44,8 +51,9 @@ async function showDetail(id) {
     for (const session of event.sessions) nodes.push(element('p',
       time(session.startAt, event.timezone, session.hasStartTime) + ' — ' + (session.isEndless ? 'без даты окончания' : time(session.endAt, event.timezone, session.hasEndTime))));
     if (!event.isActive) nodes.push(element('p', 'Событие больше не доступно в актуальном каталоге.'));
-    nodes.push(source(event.siteUrl));
+    nodes.push(saveVisitButton(event.id), source(event.siteUrl));
     $('detail-content').replaceChildren(...nodes);
+    document.dispatchEvent(new CustomEvent('planner:catalog-rendered'));
   } catch (error) {
     if (current === detailRequest) $('detail-content').replaceChildren(element('p', error.message));
   }
@@ -69,7 +77,7 @@ async function loadEvents() {
       button.addEventListener('click', () => showDetail(event.id));
       card.append(element('h3', event.title), element('p', time(event.nextSession, event.timezone, event.nextSessionHasTime)),
         element('p', event.place || 'Место уточняется'), element('p', event.isFree ? 'Бесплатно' : event.price || 'Стоимость уточняется'),
-        button, source(event.siteUrl));
+        button, saveVisitButton(event.id), source(event.siteUrl));
       $('events').append(card);
     }
     $('notice').textContent = data.totalItems ? 'Найдено: ' + data.totalItems : 'По выбранным фильтрам мероприятий пока нет.';
@@ -77,6 +85,7 @@ async function loadEvents() {
     $('prev').disabled = page === 0;
     $('next').disabled = page + 1 >= data.totalPages;
     refreshCategories();
+    document.dispatchEvent(new CustomEvent('planner:catalog-rendered'));
   } catch (error) { if (current === request) $('notice').textContent = error.message; }
 }
 $('filters').addEventListener('submit', (event) => { event.preventDefault(); page = 0; loadEvents(); });
@@ -130,6 +139,7 @@ function watchStatus() {
         lastSuccessRunId = data.lastSuccessRunId;
         page = 0;
         await loadEvents();
+        document.dispatchEvent(new CustomEvent('planner:catalog-updated'));
       }
     } catch {
       if (current !== statusRequest) return;
